@@ -35,3 +35,11 @@ function searchProduct() {
 
   displayProducts(filtered);
 }
+
+document.getElementById("bagbutton").addEventListener("click", () => {
+  alert("Item added to bag");
+});
+
+document.getElementById("wishlistbutton").addEventListener("click", () => {
+  alert("Item added to wishlist");
+});

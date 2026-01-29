@@ -19,6 +19,7 @@ h1 {
 }
 
 .search-box input {
+  margin: 8px;
   padding: 8px;
   width: 250px;
 }
@@ -57,4 +58,22 @@ h1 {
   color: green;
   font-weight: bold;
   margin-top: 8px;
+}
+
+#bagbutton,
+#wishlistbutton {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  margin-right: 10px;
+}
+
+#bagbutton {
+  background-color: green;
+}
+
+#wishlistbutton {
+  background-color: blue;
 }

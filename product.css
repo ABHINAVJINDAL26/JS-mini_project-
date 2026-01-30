@@ -1,0 +1,39 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: #f5f5f5;
+}
+
+button {
+  margin-bottom: 20px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.product-detail {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 600px;
+}
+
+.product-detail img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+}
+
+.price {
+  color: green;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.tag {
+  display: inline-block;
+  background: #eee;
+  padding: 4px 8px;
+  margin-right: 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}

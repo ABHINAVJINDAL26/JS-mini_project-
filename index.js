@@ -1,18 +1,32 @@
 let allProducts = [];
+let filteredProducts = [];
+let currentPage = 1;
+const itemsPerPage = 8;
 
 /* ---------------- FETCH PRODUCTS ---------------- */
 fetch("https://dummyjson.com/products")
   .then((res) => res.json())
   .then((data) => {
     allProducts = data.products;
-    displayProducts(allProducts);
+    filteredProducts = allProducts;
+    renderPage();
   })
   .catch(() => {
     document.getElementById("products").innerHTML =
       "<h2>Failed to load products</h2>";
   });
 
-/* ---------------- DISPLAY ---------------- */
+/* ---------------- PAGINATION RENDER ---------------- */
+function renderPage() {
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const pageItems = filteredProducts.slice(start, end);
+
+  displayProducts(pageItems);
+  updatePagination();
+}
+
+/* ---------------- DISPLAY PRODUCTS ---------------- */
 function displayProducts(products) {
   const container = document.getElementById("products");
   container.innerHTML = "";
@@ -32,96 +46,135 @@ function displayProducts(products) {
       <p class="price">₹ ${product.price}</p>
     `;
 
+    card.addEventListener("click", () => {
+      saveViewHistory(product);
+      localStorage.setItem("selectedProduct", JSON.stringify(product));
+      window.location.href = "product.html";
+    });
+
     container.appendChild(card);
   });
 }
 
-/* ---------------- LOCAL STORAGE ---------------- */
+/* ---------------- PAGINATION UI ---------------- */
+function updatePagination() {
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+  document.getElementById("pageInfo").innerText =
+    `Page ${currentPage} of ${totalPages}`;
+
+  document.getElementById("prevBtn").disabled = currentPage === 1;
+  document.getElementById("nextBtn").disabled = currentPage === totalPages;
+}
+
+/* ---------------- PAGINATION BUTTONS ---------------- */
+document.getElementById("prevBtn").addEventListener("click", () => {
+  if (currentPage > 1) {
+    currentPage--;
+    renderPage();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+});
+
+document.getElementById("nextBtn").addEventListener("click", () => {
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  if (currentPage < totalPages) {
+    currentPage++;
+    renderPage();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+});
+
+/* ---------------- SEARCH HISTORY ---------------- */
 function getSearchHistory() {
   return JSON.parse(localStorage.getItem("searchHistory")) || [];
 }
 
 function saveSearch(term) {
   let history = getSearchHistory();
+  if (history.some((item) => item.term === term)) return;
 
-  const exists = history.some((item) => item.term === term);
-  if (exists) return;
-
-  const time = new Date().toLocaleString("en-IN", {
-    dateStyle: "medium",
-    timeStyle: "short",
+  history.push({
+    term,
+    time: new Date().toLocaleString("en-IN", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }),
   });
-
-  history.push({ term, time });
 
   localStorage.setItem("searchHistory", JSON.stringify(history));
 }
 
-/* ---------------- SEARCH ---------------- */
+/* ---------------- VIEW HISTORY ---------------- */
+function getViewHistory() {
+  return JSON.parse(localStorage.getItem("viewHistory")) || [];
+}
+
+function saveViewHistory(product) {
+  let history = getViewHistory();
+
+  history.unshift({
+    title: product.title,
+    time: new Date().toLocaleString("en-IN", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }),
+  });
+
+  history = history.slice(0, 10);
+  localStorage.setItem("viewHistory", JSON.stringify(history));
+}
+
+/* ---------------- SEARCH (BUTTON) ---------------- */
 function searchProduct() {
   const value = document.getElementById("searchInput").value.toLowerCase();
   const suggestionsBox = document.getElementById("suggestions");
 
   if (!value) {
-    displayProducts(allProducts);
+    filteredProducts = allProducts;
+    currentPage = 1;
+    renderPage();
     suggestionsBox.innerHTML = "";
     return;
   }
 
-  // ✅ FINAL SEARCH → SAVE HISTORY
   saveSearch(value);
 
-  const filtered = allProducts.filter((product) =>
+  filteredProducts = allProducts.filter((product) =>
     product.title.toLowerCase().includes(value),
   );
 
-  displayProducts(filtered);
+  currentPage = 1;
+  renderPage();
   suggestionsBox.innerHTML = "";
+}
+
+/* ---------------- LIVE FILTER ---------------- */
+function filterProductsLive(value) {
+  filteredProducts = allProducts.filter((product) =>
+    product.title.toLowerCase().includes(value),
+  );
+
+  currentPage = 1;
+  renderPage();
 }
 
 /* ---------------- SUGGESTIONS ---------------- */
 function showSuggestions(input) {
   const suggestionsBox = document.getElementById("suggestions");
   suggestionsBox.innerHTML = "";
-
   if (!input) return;
 
-  /* ---------- 1. PRODUCT BASED SUGGESTIONS ---------- */
-  const productMatches = allProducts
-    .filter((product) => product.title.toLowerCase().includes(input))
-    .slice(0, 5); // limit
-
-  productMatches.forEach((product) => {
-    const div = document.createElement("div");
-    div.innerText = product.title;
-
-    div.onclick = () => {
-      document.getElementById("searchInput").value = product.title;
-      searchProduct();
-      suggestionsBox.innerHTML = "";
-    };
-
-    suggestionsBox.appendChild(div);
-  });
-
-  /* ---------- 2. SEARCH HISTORY SUGGESTIONS ---------- */
-  const history = getSearchHistory();
-
-  history
-    .filter(
-      (item) =>
-        item.term.includes(input) &&
-        !productMatches.some((p) => p.title === item.term),
-    )
-    .slice(0, 3)
-    .forEach((item) => {
+  allProducts
+    .filter((p) => p.title.toLowerCase().includes(input))
+    .slice(0, 5)
+    .forEach((p) => {
       const div = document.createElement("div");
-      div.innerText = `🕘 ${item.term}`;
+      div.innerText = p.title;
 
       div.onclick = () => {
-        document.getElementById("searchInput").value = item.term;
+        document.getElementById("searchInput").value = p.title;
         searchProduct();
-        suggestionsBox.innerHTML = "";
       };
 
       suggestionsBox.appendChild(div);
@@ -134,15 +187,14 @@ document.getElementById("searchInput").addEventListener("input", (e) => {
   const suggestionsBox = document.getElementById("suggestions");
 
   if (!value) {
-    displayProducts(allProducts);
+    filteredProducts = allProducts;
+    currentPage = 1;
+    renderPage();
     suggestionsBox.innerHTML = "";
     return;
   }
 
-  // ✅ LIVE PRODUCT FILTER
   filterProductsLive(value);
-
-  // ✅ LIVE SUGGESTIONS
   showSuggestions(value);
 });
 
@@ -155,14 +207,11 @@ document.getElementById("wishlistbutton").addEventListener("click", () => {
   alert("Item added to wishlist");
 });
 
+/* ---------------- PAGE NAVIGATION ---------------- */
 function openHistory() {
   window.location.href = "history.html";
 }
 
-function filterProductsLive(value) {
-  const filtered = allProducts.filter((product) =>
-    product.title.toLowerCase().includes(value),
-  );
-
-  displayProducts(filtered);
+function openViewHistory() {
+  window.location.href = "viewhistory.html";
 }

@@ -101,3 +101,47 @@ h1 {
 #wishlistbutton {
   background-color: blue;
 }
+
+.view-history {
+  margin-top: 20px;
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  max-width: 300px;
+}
+
+.view-history ul {
+  list-style: none;
+  padding: 0;
+}
+
+.view-history li {
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.view-history small {
+  color: gray;
+  font-size: 12px;
+}
+
+.hidden {
+  display: none;
+}
+
+.pagination {
+  margin: 30px 0;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.pagination button {
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

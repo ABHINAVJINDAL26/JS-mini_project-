@@ -15,11 +15,11 @@ h1 {
 }
 
 .search-box {
-  margin-bottom: 20px;
+  margin-bottom: 40px;
+  position: relative;
 }
 
 .search-box input {
-  margin: 8px;
   padding: 8px;
   width: 250px;
 }
@@ -27,6 +27,27 @@ h1 {
 .search-box button {
   padding: 9px 15px;
   cursor: pointer;
+}
+
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 250px;
+  background: white;
+  border: 1px solid #ccc;
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.suggestions div {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.suggestions div:hover {
+  background-color: #f0f0f0;
 }
 
 .product-container {
@@ -41,11 +62,14 @@ h1 {
   padding: 15px;
   border-radius: 6px;
   text-align: center;
-  transition: transform 0.3s;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
 }
 
 .card:hover {
   transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .card img {

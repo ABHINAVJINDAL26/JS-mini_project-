@@ -8,8 +8,10 @@
   </head>
   <body>
     <h1>Product Store</h1>
+
     <button id="bagbutton">Add to Bag</button>
     <button id="wishlistbutton">Wishlist</button>
+    <button onclick="openHistory()">Search History</button>
 
     <div class="search-box">
       <input
@@ -18,6 +20,8 @@
         placeholder="Search Your Product Here"
       />
       <button onclick="searchProduct()">Search</button>
+
+      <div id="suggestions" class="suggestions"></div>
     </div>
 
     <div class="product-container" id="products"></div>
